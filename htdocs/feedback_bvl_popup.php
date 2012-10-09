@@ -313,7 +313,7 @@ if (!empty($_REQUEST['sessionID'])) {
     $tpl_data['formAction'] .= "sessionID=".$_REQUEST['sessionID']."&";
 }
 if (!empty($_REQUEST['commentID'])) {
-    $tpl_data['formAction'] .= "commentID=".$_REQUEST['commentID']."";
+	$tpl_data['formAction'] .= "commentID=".$_REQUEST['commentID']."&" . "test_name=".$_REQUEST['test_name']."";;
 }
 
 //set study name
