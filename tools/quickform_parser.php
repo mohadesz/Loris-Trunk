@@ -97,7 +97,6 @@ foreach($files AS $file){
     echo "Initializing instrument object...\n";
     $obj->setup(NULL,NULL);
     //Some instruments ought not be parsed with the quickform_parser FIGS, FHRDC
-    
     if ((in_array($obj->testName, $instrumentsToSkip))) { 
         echo "Unconventional structure.  quickform_parser wants to skip file {$file}\n"; 
         continue;
@@ -225,9 +224,6 @@ function parseElements($elements, $groupLabel=""){
     return $output;
     //print_r($obj->form);
 }
-
-
-
 
 /**
  * Get the excluded instruments from the config file
