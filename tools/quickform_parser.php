@@ -240,7 +240,7 @@ function getExcludedInstruments()
     
     $ex_instruments=array();
     foreach ($excluded_instruments as $instruments) {
-        foreach ($instruments as $instrument) {
+        foreach (Utility::asArray($instruments) as $instrument) {
             $ex_instruments[$instrument] = $instrument;
         }
 
