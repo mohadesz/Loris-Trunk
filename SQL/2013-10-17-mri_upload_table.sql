@@ -5,9 +5,8 @@ CREATE TABLE `mri_upload` (
   `UploadDate` DateTime DEFAULT NULL,
   `SourceLocation` varchar(255) NOT NULL DEFAULT '',
   `MincInserted` tinyint(1) NOT NULL DEFAULT '0',
-  `DicomInserted` tinyint(1) NOT NULL DEFAULT '0',
-  `UploadSuccess` tinyint(1) NOT NULL DEFAULT '0',
   `TarchiveID` int(11) DEFAULT NULL,
   `SessionID` int(10) unsigned DEFAULT NULL,
+  `IsValidated` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`UploadID`)
 ) ;
