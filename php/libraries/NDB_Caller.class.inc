@@ -138,6 +138,13 @@ class NDB_Caller extends PEAR
             return PEAR::raiseError("NDB_Caller::loadMenu() save: ".$success->getMessage());
         }
 
+        if (method_exists($menu, 'save')) {
+            $success = $menu->save();
+            if (Utility::isErrorX($success)) {
+                return PEAR::raiseError("NDB_Caller::loadForm() save: ".$success->getMessage());
+            }
+        }
+        
         if($controlPanel) {
             $menu->controlPanel = $controlPanel->display();
         }
