@@ -57,7 +57,6 @@ class NDB_Menu extends NDB_Page
         // set the local variables
         $obj->menu = $menu;
         $obj->mode = $mode;        
-
         $access = $obj->_hasAccess();
         if (Utility::isErrorX($access)) {
             return PEAR::raiseError("NDB_Menu::factory(): ".$access->getMessage());

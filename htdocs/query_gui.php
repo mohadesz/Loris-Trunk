@@ -1,8 +1,9 @@
-<?
+<?php
 /**
  * @package main
  * @subpackage query_gui
  */
+ini_set('default_charset', 'utf-8');
 ob_start('ob_gzhandler');
 
 // start benchmarking
@@ -23,12 +24,17 @@ $studyTitle = $config->getSetting('title');
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <link rel="stylesheet" href="<?php if(!$css){ print main.css; } else { print  $css; }?>" type="text/css" />
-    <script src="js/jquery/jquery-1.4.2.min.js"></script>
+    <script src="js/jquery/jquery-1.11.0.min.js"></script>
     <script src='dqgui_core.js'></script>
     <script src='dqgui_step1.js'></script>
     <script src='dqgui_step2.js'></script>
     <script src='dqgui_step3.js'></script>
     <script src='dqgui_step4.js'></script>
+
+    <link type="text/css" href="css/jqueryslidemenu.css" rel="Stylesheet" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery/jqueryslidemenu.js"></script>
+
 
     <link rel="shortcut icon" href="images/mni_icon.ico" type="image/ico" />
     <title><?php print  $studyTitle; ?> - Data Query GUI</title>

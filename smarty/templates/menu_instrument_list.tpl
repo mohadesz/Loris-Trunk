@@ -1,6 +1,6 @@
 <!-- table title -->
 <br />
-<table border="0" valign="bottom" width="100%"><td class="controlPanelSection">Behavioral Battery of Instruments</td></table>
+<table border="0" valign="bottom" width="100%"><td class="controlPanelSection"><strong>Behavioral Battery of Instruments</strong></td></table>
 
 <!-- table with list of instruments and links to open them -->
 <table class="listColorCoded" cellpadding="2">
@@ -20,7 +20,7 @@
 	    <th nowrap="nowrap">Double Data Entry Status</th>
     </tr>	
 	{section name=instrument loop=$instruments[group]}
-   	<tr>
+   	<tr{if $instruments[group][instrument].isDirectEntry} class="directentry"{/if}>
     	<td nowrap="nowrap">
 	    	<a href="main.php?test_name={$instruments[group][instrument].testName}&candID={$candID}&sessionID={$sessionID}&commentID={$instruments[group][instrument].commentID}">
             {$instruments[group][instrument].fullName}</a></td>

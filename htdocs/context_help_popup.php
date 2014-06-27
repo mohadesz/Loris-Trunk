@@ -1,4 +1,6 @@
 <?php
+set_include_path(get_include_path().":../project/libraries:../php/libraries:");
+ini_set('default_charset', 'utf-8');
 /**
  * context help script
  *
@@ -21,6 +23,8 @@ if(PEAR::isError($DB)) {
 
 // create user object
 $user =& User::singleton($_SESSION['State']->getUsername());
+$tpl_data['user_site_name'] = $user->getSiteName();
+$tpl_data['user_full_name'] = $user->getFullname();
 if (PEAR::isError($user)) {
     $tpl_data['error_message'] = $user->getMessage();
 }

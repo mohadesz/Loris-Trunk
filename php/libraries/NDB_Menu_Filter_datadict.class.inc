@@ -20,7 +20,7 @@ class NDB_Menu_Filter_datadict extends NDB_Menu_Filter
 			return PEAR::raiseError("User Error: ".$user->getMessage());
 		}
 
-		return ($user->hasPermission('data_dict'));
+		return ($user->hasPermission('data_dict') || $user->hasPermission('data_dict_edit'));
 	}
 
 	function _setupVariables()
@@ -94,7 +94,7 @@ class NDB_Menu_Filter_datadict extends NDB_Menu_Filter
             $query .= "*";
         }
     	// add the base query
-		if ($_REQUEST['Description'] =='modified'){
+		if (isset($_REQUEST['Description']) && $_REQUEST['Description'] =='modified') {
 			$query .= " FROM parameter_type pt JOIN parameter_type_override pto USING (Name) WHERE pt.Queryable=1";
 		}
 		else{

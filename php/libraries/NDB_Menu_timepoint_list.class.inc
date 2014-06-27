@@ -1,5 +1,6 @@
 <?php
 require_once 'NDB_Menu.class.inc';
+require_once 'TimePoint_List_ControlPanel.class.inc';
 
 /**
  * The timepoint list menu
@@ -52,7 +53,7 @@ class NDB_Menu_timepoint_list extends NDB_Menu
         if (Utility::isErrorX($candidate)) {
             return PEAR::raiseError("Candidate Error (".$_REQUEST['candID']."): ".$candidate->getMessage());
         }
-
+        
         $numberOfVisits = 0;
         $this->tpl_data['candID'] = $_REQUEST['candID'];
         $this->tpl_data['PSCID'] = $candidate->getPSCID();
@@ -65,6 +66,7 @@ class NDB_Menu_timepoint_list extends NDB_Menu
             }
             $username = $user->getData('UserID');
 
+            $feedback_select_inactive = null;
             if ($user->hasPermission('bvl_feedback')) {
                 $feedback_select_inactive = 'Y';
             }
@@ -179,6 +181,8 @@ class NDB_Menu_timepoint_list extends NDB_Menu
                 }
             } // end list
         }
+
+        $this->tpl_data['actions'] = $this->getActionButtons();
     }
 
     function _determinePreviousStage($sessionID)
@@ -198,6 +202,11 @@ class NDB_Menu_timepoint_list extends NDB_Menu
             return  'Screening';
         }
         return  'Not Started';
+    }
+
+    function getActionButtons() {
+        $controlPanel = new TimePoint_List_ControlPanel($_REQUEST['candID']);
+        return $controlPanel->display();
     }
 }
 ?>

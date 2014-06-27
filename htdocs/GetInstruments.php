@@ -2,6 +2,7 @@
 /* This is used by the stats page to get the list of scorable columns for an
  * instrument via AJAX. It's used so that ScatterPlot-SVG.php can be run for
  * any scorable in an instrument, dynamically */
+ini_set('default_charset', 'utf-8');
 require_once "Database.class.inc";
 require_once 'NDB_Config.class.inc';
 require_once 'NDB_Client.class.inc';
@@ -19,6 +20,7 @@ require_once "Utility.class.inc";
 
 $instruments = Utility::getVisitInstruments($_REQUEST['visit_label']);
 
+print "All Instruments\n";
 foreach($instruments as $instrument){
     print $instrument['Test_name_display'] . "\n";
 }
