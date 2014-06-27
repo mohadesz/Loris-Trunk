@@ -15,6 +15,7 @@
  * @link     https://www.github.com/aces/Loris-Trunk/
  */
 set_include_path(get_include_path().":../project/libraries:../php/libraries:");
+ini_set('default_charset', 'utf-8');
 require_once 'NDB_Config.class.inc';
 require_once 'Smarty_hook.class.inc';
 require_once 'NDB_Caller.class.inc';
@@ -345,6 +346,7 @@ class DirectDataEntryMainPage
         $workspace = $this->caller->load(
             $this->TestName,
             $this->Subtest,
+            null,
             $this->CommentID,
             $nextpage
         );
@@ -381,6 +383,17 @@ class DirectDataEntryMainPage
                     'CommentID' => $this->CommentID
                 )
             );
+            $Responses_flag = $DB->update(
+                'flag',
+                array(
+                    'Data_entry' => 'Complete',
+                    'Administration'=>'All'
+                ),
+                array(
+                    'CommentID' => $this->CommentID
+                )
+
+             );
 
         } else {
             $this->updateStatus('In Progress');
