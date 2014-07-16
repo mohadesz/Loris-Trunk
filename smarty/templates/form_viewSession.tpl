@@ -35,7 +35,7 @@
     	<tr>
 	    <td id='td-mri-lefttable-select'>
 	    {if $has_permission}
-	    {html_options|indent:12 options=$selected_options selected=$files[file].Selected tabindex=3 name=selectedvol[`$files[file].FileID`]}
+	    {html_options options=$selected_options selected=$files[file].Selected tabindex="3" name="selectedvol[`$files[file].FileID`]"}
 	    {else}
 		{if $files[file].Selected != ""}{$files[file].Selected}
 		{else}&nbsp;{/if}
@@ -51,7 +51,7 @@
 	    <td id='td-mri-lefttable-select'>
 	    {if $has_permission}	
 	        {if $files[file].New}<font color='red'>NEW</font>{/if}
-		{html_options options=$status_options selected=$files[file].QCStatus tabindex=4 name=status[`$files[file].FileID`]}
+		{html_options options=$status_options selected=$files[file].QCStatus tabindex="4" name="status[`$files[file].FileID`]"}
 	    {else}
 		{if $files[file].QCStatus != ""}{$files[file].QCStatus}
 		{else}&nbsp;{/if}
@@ -65,7 +65,7 @@
                 {if $files[file].Caveat}
                 <a href="main.php?test_name=mri_protocol_check_violations&SeriesUID={$files[file].SeriesUID}&filter=true">Caveat List</a>
                 {/if}
-                {html_options options=$caveat_options selected=$files[file].Caveat tabindex=5 name=caveat[`$files[file].FileID`]}
+                {html_options options=$caveat_options selected=$files[file].Caveat tabindex="5" name="caveat[`$files[file].FileID`]"}
                 {else}
                 {if $files[file].Caveat}<a href="main.php?test_name=mri_protocol_check_violations&SeriesUID={$files[file].SeriesUID}&filter=true">Caveats</a>
                 {else}No caveats{/if}
@@ -86,7 +86,7 @@
             <thead>
                 <tr>
                     <th>Filename</th>
-                    <td>{if $files[file].Filename != ""}{$files[file].Filename}
+                    <td colspan='2'>{if $files[file].Filename != ""}{$files[file].Filename}
 		    	{else}&nbsp;{/if}</td>
 		    <td{if $files[file].QCStatus != ""} class="image{$files[file].QCStatus}"{/if}>{$files[file].QCStatus}</td>
                 </tr>
@@ -94,7 +94,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="3">
+                    <td colspan="4">
 		    <a href="#{$smarty.section.file.index}" onClick="window.open('minc.html?minc_id={$files[file].FileID}', 'BrainBrowser Volume Viewer', 'location = 0,width = auto, height = auto')">
                     <img class='img-checkpic' src="{$files[file].CheckPic}">
                     </a>
@@ -104,21 +104,43 @@
             <tfoot> 
                 <tr>
                     <th>Voxel size</th>
-                    <td colspan="2">
+                    <td colspan="3">
 		    {if $files[file].Xstep != "" and $files[file].Ystep != ""}X: {$files[file].Xstep} mm Y: {$files[file].Ystep} mm Z: {$files[file].Zstep} mm
                     {elseif $files[file].Xstep != ""}{$files[file].Xstep}{else}&nbsp;{/if}
                     </td>
                 </tr>
+                {if $files[file].SourceFile != ''}
+                <tr>
+                    <th>Source file</th>
+                    <td colspan='3'>{$files[file].SourceFile}</td>
+                </tr>
+                {/if}
+                {if $files[file].Tool != ""}
+                <tr>
+                     <th>Pipeline info</th>
+                     <td> {if $files[file].ProcessingPipeline != ""}{$files[file].ProcessingPipeline}{else}&nbsp;{/if}</td>
+                     <td> Version: {$files[file].Tool}</td>
+                     <td> {if $files[file].ProcDate > 0}Proc. Date: {$files[file].procDate|date_format}{else}&nbsp;{/if}</td>
+                </tr>
+                {/if}        
+                {if $files[file].ProcessingPipeline eq "DTIPrepPipeline"}
+                <tr>
+                     <th>DTIPrep files</th>
+                     <td> {if $files[file].XMLprotocol != ""}<a href="mri/jiv/get_file.php?file={$files[file].XMLprotocol}">Download XML Protocol</a>{else}&nbsp;{/if}</td>
+                     <td> {if $files[file].XMLreport != ""}<a href="mri/jiv/get_file.php?file={$files[file].XMLreport}">Download XML Report</a>{else}&nbsp;{/if}</td>
+                     <td> {if $files[file].NrrdFile != ""}<a href="mri/jiv/get_file.php?file={$files[file].NrrdFile}">Download NRRD</a>{else}&nbsp;{/if}</td>
+                </tr>
+                {/if} 
 		{if $files[file].FileID}
                 <tr>
                     <td>
                         <a href="#{$smarty.section.file.index}" onClick='javascript:show_jiv(new Array("{$files[file].JivFilename}"), new Array("{$files[file].JivAddress}"), false)' accesskey="{$smarty.section.file.index}">JIV Viewer</a>
                     </td>
-                    <td>
+                    <td colspan='2'>
                         <a href="#{$smarty.section.file.index}" onClick="window.open('minc.html?minc_id={$files[file].FileID}', 'BrainBrowser Volume Viewer', 'location=0,width=auto,height=auto')">BrainBrowser Volume Viewer</a>
                     </td>
                     <td>
-                        <a href="mri/jiv/get_file.php?file={$files[file].FullFilename}">Download</a>
+                        <a href="mri/jiv/get_file.php?file={$files[file].FullFilename}">Download MINC</a>
 		    </td>
                 </tr>{/if}
             </tfoot> 
@@ -143,11 +165,10 @@
         {if $files[file].SliceThickness != ""&& $files[file].SliceThickness != "0.00"}<tr><th>Slice Thick</th><td>{$files[file].SliceThickness} mm</td></tr>{/if}
         {if $files[file].Time != "" && $files[file].Time != "0.00"}<tr><th>Nb of vol.</th><td>{$files[file].Time} volumes</td></tr>{/if}
         {if $files[file].Comment != ""}<tr><th>Comment</th><td>{$files[file].Comment}</td></tr>{/if}
-        {if $files[file].ProcessingPipeline != ""}<tr><th>Processing pipeline</th><td>{$files[file].ProcessingPipeline}</td></tr>{/if}
-        {if $files[file].TotalRejected != ""}<tr><th>Nb of rejected directions</th><td>{$files[file].TotalRejected}</td></tr>{/if}
         {if $files[file].SlicewiseRejected != ""}<tr><th>Slicewise correlations (Nb)</th><td>{$files[file].SlicewiseRejected}</td></tr>{/if}
         {if $files[file].InterlaceRejected != ""}<tr><th>Interlace correlations (Nb)</th><td>{$files[file].InterlaceRejected}</td></tr>{/if}
         {if $files[file].IntergradientRejected != ""}<tr><th>Gradient-wise correlations (Nb)</th><td>{$files[file].IntergradientRejected}</td></tr>{/if}
+        {if $files[file].TotalRejected != ""}<tr><th width="100px">Nb of rejected directions</th><td>{$files[file].TotalRejected}{else}&nbsp;</td></tr>{/if}
        	</table>
     </td>
 </tr>
