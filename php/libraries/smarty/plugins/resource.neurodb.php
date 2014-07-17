@@ -2,7 +2,7 @@
 function smarty_resource_neurodb_source($rsrc_name, &$source, $smarty) {
     if(strpos($rsrc_name, '/')===0) $filename = $rsrc_name;
     else {
-        $default_name=$smarty->template_dir.$rsrc_name;
+        $default_name=$smarty->LorisTemplateDir.$rsrc_name;
         $custom_name=$smarty->project_template_dir.$rsrc_name;
         $module_name = $smarty->modules_dir 
             . $smarty->ModuleName . "/templates/$rsrc_name";
@@ -25,7 +25,7 @@ function smarty_resource_neurodb_source($rsrc_name, &$source, $smarty) {
 function smarty_resource_neurodb_timestamp($rsrc_name, &$timestamp, $smarty) {
     if(strpos($rsrc_name, '/')===0) $filename = $rsrc_name;
     else {
-        $default_name=$smarty->template_dir.$rsrc_name;
+        $default_name=$smarty->LorisTemplateDir.$rsrc_name;
         $custom_name=$smarty->project_template_dir.$rsrc_name;
         $module_name = $smarty->modules_dir 
             . $smarty->ModuleName . "/templates/$rsrc_name";
