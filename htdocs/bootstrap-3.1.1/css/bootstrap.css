@@ -1,6 +1,14 @@
 /* 
  * CSS not implemented in bootstrap
 */
+.loginheader {
+background: #064785;
+color: #fff;
+padding-top: 3px;
+font-size: 130%;
+text-align: center;
+}
+
 html, body {height: 100%;}
 #wrap {min-height: 100%;}
 
