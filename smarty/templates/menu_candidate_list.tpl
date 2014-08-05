@@ -4,6 +4,7 @@
 <script type="text/javascript" src="js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript" src="js/advancedMenu.js"></script>
 
+<div class="row">
 <div class="col-sm-9">
 <div class="panel panel-primary">
     <div class="panel-heading" onclick="hideFilter();">
@@ -174,6 +175,7 @@
         <br><br><br>
     </div>
     <form class="form-horizontal" name="accessProfileForm" method="get" action="main.php" onSubmit="return checkAccessProfileForm();">
+        <input type="hidden" name="test_name" value="timepoint_list">
         <div class="form-group">
             <label class="col-sm-5 control-label">
                 DCC-ID:            
@@ -195,25 +197,18 @@
         <input tabindex="3" rowspan="2" type="submit" value="Open Profile" class="btn btn-sm btn-primary col-md-5 col-sm-12 col-md-offset-8">
     </form>
 </div>
-<div class="hidden-xs">
-    <br><br><br><br><br><br><br><br><br><br><br>
 </div>
-<div class="col-xs-12">
-    <div class="pull-right">
-        {$page_links}
-    </div>
-</div>
-<br>
 <!-- <table> -->
 <!--  title table with pagination -->
-<!-- <table border="0" valign="bottom" width="100%"> -->
-<!-- <tr> -->
+<div class="row">
+<table border="0" valign="bottom" width="100%">
+<tr>
     <!-- title -->
-    <!-- <td class="controlPanelSection"></td> -->
+    <td class="controlPanelSection"></td>
     <!-- display pagination links -->
-    <!-- <td align="right">{$page_links}</td> -->
-<!-- </tr> -->
-<!-- </table> -->
+    <td align="right">{$page_links}</td>
+</tr>
+</table>
 <!-- </form> -->
 <!-- start data table -->
 <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
@@ -272,4 +267,5 @@
             <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
     </div>
+</div>
 </div>

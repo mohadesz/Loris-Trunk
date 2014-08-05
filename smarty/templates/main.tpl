@@ -207,6 +207,15 @@
             {if $dynamictabs neq "dynamictabs"}
                 <br><br><br>
             <div class="page-content inset">
+                {if $console}
+                    <div class="alert alert-warning" role="alert">
+                        <h3>Console Output</h3>
+                        <div>
+                        <pre>{$console}</pre>
+                        </div>
+                    </div>
+
+                {/if}
                 <!-- <div class="panel panel-primary"> -->
                     
                     {if $crumbs != ""}
@@ -484,19 +493,21 @@
             {else}
             <div id="footer" class="footer navbar-bottom">
             {/if}
-                <ul id="navlist" style="margin-top: 5px; margin-bottom: 2px;" align="center">
-                    <li id="active">
-                        |
-                    </li>
-                    {foreach from=$links item=link}
-                            <li>  
-                                <a href="{$link.url}" style="color: #2FA4E7" target="{$link.windowName}">
-                                    {$link.label}
-                                </a> 
-                                |
-                            </li>
-                    {/foreach}
-                </ul>
+                <center>
+                    <ul id="navlist" style="margin-top: 5px; margin-bottom: 2px;">
+                        <li id="active">
+                            |
+                        </li>
+                        {foreach from=$links item=link}
+                                <li>  
+                                    <a href="{$link.url}" style="color: #2FA4E7" target="{$link.windowName}">
+                                        {$link.label}
+                                    </a> 
+                                    |
+                                </li>
+                        {/foreach}
+                    </ul>    
+                </center>
                 <div align="center" colspan="1" style="color:#808080" >
                     Powered by LORIS &copy; 2013. All rights reserved.
                 </div>
