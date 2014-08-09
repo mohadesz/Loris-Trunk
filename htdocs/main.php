@@ -5,6 +5,9 @@
 set_include_path(get_include_path().":../project/libraries:../php/libraries:");
 ini_set('default_charset', 'utf-8');
 ob_start('ob_gzhandler');
+// Create an output buffer to capture console output, separately from the 
+// gzip handler.
+ob_start();
 // start benchmarking
 require_once 'Benchmark/Timer.php';
 $timer = new Benchmark_Timer;
@@ -37,8 +40,9 @@ function tplFromRequest($param) {
     }
 }
 
-tplFromRequest('test_name');
-tplFromRequest('subtest');
+$tpl_data['test_name'] = $TestName;
+$tpl_data['subtest']   = $subtest;
+
 tplFromRequest('candID');
 tplFromRequest('sessionID');
 tplFromRequest('commentID');
@@ -248,9 +252,19 @@ foreach(Utility::toArray($links['link']) AS $link){
 }
 
 
+if ($config->getSetting("sandbox") === '1') {
+    $tpl_data['sandbox'] = true;
+}
+
+// Assign the console output to a variable, then stop
+// capturing output so that smarty can render
+$tpl_data['console'] = ob_get_contents();
+ob_end_clean();
+
 
 //Output template using Smarty
 $tpl_data['css'] = $config->getSetting('css');
+
 $smarty = new Smarty_neurodb;
 $smarty->assign($tpl_data);
 $smarty->display('main.tpl');
