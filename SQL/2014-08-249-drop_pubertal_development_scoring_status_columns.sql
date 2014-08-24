@@ -1,0 +1,2 @@
+ALTER TABLE pubertal_development drop column pubertyfemale_totalscore_status;
+ALTER TABLE pubertal_development drop column pubertymale_totalscore_status;
