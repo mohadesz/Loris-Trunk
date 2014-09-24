@@ -59,7 +59,11 @@
 								{/foreach}
 							</tr>
 					{else}
-						<tr>
+						{if $element.error}
+				    	<tr class="has-error">
+				        {else}
+				        <tr>
+				        {/if}
 							<td colspan="2">{$element.label}</td>
 							{foreach key=gkey item=gitem from=$element.elements}
 								{if $gitem.type == 'date'}
@@ -71,6 +75,14 @@
 								{/if}
 							{/foreach}
 						</tr>
+						{if $element.error}
+							<tr>
+								<td colspan="2"></td>
+			                    <td colspan="{$element.elements|@count}" class="has-error">
+			                    	<font class="form-error">{$element.error}</font>
+			                    </td>
+			                </tr>
+						{/if}
 					{/if}
 				{/if}
 			{else}
@@ -106,7 +118,8 @@
 	{foreach from=$form.sections item=section}
 		<div class="col-sm-12">
 			<div class="col-sm-8">
-				<h5 align="center">{$section.header}</h5>
+				<h3 align="center">{$section.header}</h3>
+				<br>
 			</div>
 		</div>
 		{foreach from=$section.elements item=element}
@@ -157,7 +170,11 @@
 									{/foreach}
 								</tr>
 						{else}
-							<tr>
+							{if $element.error}
+					    	<tr class="has-error">
+					        {else}
+					        <tr>
+					        {/if}
 								<td colspan="2">{$element.label}</td>
 								{foreach key=gkey item=gitem from=$element.elements}
 									{if $gitem.type == 'date'}
@@ -169,6 +186,14 @@
 									{/if}
 								{/foreach}
 							</tr>
+							{if $element.error}
+								<tr>
+									<td colspan="2"></td>
+				                    <td colspan="{$element.elements|@count}" class="has-error">
+				                    	<font class="form-error">{$element.error}</font>
+				                    </td>
+				                </tr>
+							{/if}
 						{/if}
 					{/if}
 				{else}
