@@ -1,0 +1,1 @@
+DELETE FROM candidate WHERE PSCID= '14_43_04';
