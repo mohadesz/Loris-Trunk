@@ -66,23 +66,6 @@ if ! [ $BASH ] ; then
     exit 2
 fi
 
-if [ -f ../project/config.xml ]; then
-    echo "Loris appears to already be installed. Aborting."
-    exit 2;
-fi
-
-# Check that we're running in the proper directory structure.
-if [ ! -f ../SQL/0000-00-00-schema.sql ] ; then
-    echo "Could not find schema file; make sure the current directory is in tools/ under the distribution."
-    exit 2
-fi
-
-# Create some subdirectories, if needed.
-mkdir -p ../project ../project/libraries ../project/instruments ../project/templates ../project/tables_sql ../smarty/templates_c
-
-# Setting 777 permissions for templates_c
-chmod 777 ../smarty/templates_c
-
 if [[ -n $(which php) ]]; then
     echo ""
     echo "PHP appears to be installed."
@@ -105,31 +88,33 @@ cat <<QUESTIONS
 
 Please answer the following questions. You'll be asked:
 
-  1) A name for the MySQL Database. This should be
-     a simple identifier such as "Loris" or "Abc_Def".
-     This database will be created later on.
+  1) Your project directory name from section A) of the Installation Guide.
+     (Will be used to modify the paths for Imaging data in the generated
+     config.xml file for LORIS, and may also be used to automatically
+     create/install apache config files.)
 
-  2) The hostname for the machine where the MySQL server will run on
+  2) A name for the MySQL Database. This should be
+     a simple identifier such as "Loris" or "Abc_Def".
+     This database will be created later on so please make sure
+     a database with the same name does not already exist.
+
+  3) The hostname for the machine where the MySQL server will run on
      (this is where we'll create the database).
 
-  3) The MySQL username that the Loris system will use to connect
+  4) The MySQL username that the Loris system will use to connect
      to this server and database; this MySQL account will be
-     created later on.
+     created later on so please make sure a user with the same name
+     does not already exist.
 
-  4) The password for this username (it will be set later on).
+  5) The password for this username (it will be set later on).
 
-  5) Another password for the 'admin' account of the Loris DB
+  6) Another password for the 'admin' account of the Loris DB
      (it will also be set later on).
 
-  6) Credentials of an existing root MySQL account to install the
+  7) Credentials of an existing root MySQL account to install the
      default schema. This will only be used once, to create and
      populate the default tables, and to grant privileges to the
-     newly created MySQL user in part c).
-
-  7) Your project name. This should be an alphanumeric name.
-     It will be used to modify the paths for MRI in the generated
-     config.xml file for LORIS. It may also be used to automatically
-     create/install apache config files.
+     newly created MySQL user in part 3).
 
 QUESTIONS
 
@@ -148,6 +133,45 @@ while true; do
 done;
 
 echo ""
+
+while [ "$projectname" == "" ]; do
+        read -p "Enter project name: " projectname
+        echo $projectname | tee -a $LOGFILE > /dev/null
+        case $projectname in
+                "" )
+                        read -p "Enter project name: " projectname
+                        continue;;
+                * )
+                        break;;
+        esac
+done;
+
+if [ -f ../project/config.xml ]; then
+    echo "Loris appears to already be installed. Aborting."
+    exit 2;
+fi
+
+# Check that we're running in the proper directory structure.
+if [ ! -f ../SQL/0000-00-00-schema.sql ] ; then
+    echo "Could not find schema file; make sure the current directory is in tools/ under the distribution."
+    exit 2
+fi
+
+# Create some subdirectories, if needed.
+mkdir -p ../project ../project/libraries ../project/instruments ../project/templates ../project/tables_sql ../smarty/templates_c
+
+# Setting 777 permissions for templates_c
+chmod 777 ../smarty/templates_c
+
+# set the group user to www-data for tools/logs directory:
+if [ -d logs ]; then
+	chgrp www-data logs
+	# set the proper permission for the tools/logs directory:
+	chmod 770 logs 
+fi
+
+
+
 
 while [ "$mysqldb" == "" ]; do
 	read -p "What is the database name? " mysqldb
@@ -214,21 +238,21 @@ done;
 
 stty echo ; echo ""
 
-while [ "$mysqlrootuser" == "" ]; do 
+while [ "$mysqlrootuser" == "" ]; do
        	read -p "Existing root MySQL username: " mysqlrootuser
 	echo $mysqlrootuser | tee -a $LOGFILE > /dev/null
        	case $mysqlrootuser in
                	"" )
                        	read -p "Existing root MySQL username: " mysqlrootuser
                        	continue;;
-                * ) 
+                * )
        	                break;;
        	esac
 done;
 
 stty -echo
 
-while true; do 
+while true; do
         read -p "MySQL password for user '$mysqlrootuser': " mysqlrootpass
         echo ""
         read -p "Re-enter the password to check for accuracy " mysqlrootpass2
@@ -240,51 +264,42 @@ while true; do
 done;
 
 stty echo
-echo ""
 
-while [ "$projectname" == "" ]; do 
-        read -p "Enter project name: " projectname
-	echo $projectname | tee -a $LOGFILE > /dev/null
-       	case $projectname in
-               	"" )
-                       	read -p "Enter project name: " projectname
-                       	continue;;
-                * ) 
-       	                break;;
-       	esac
+while true; do
+    echo ""
+    echo "Attempting to create the MySQL database '$mysqldb' ..."
+    result=$(echo "CREATE DATABASE $mysqldb" | mysql -h$mysqlhost --user=$mysqlrootuser --password="$mysqlrootpass" -A 2>&1);
+    if [[ $result == *1044* ]] || [[ $result == *1045* ]]; then
+        echo "Could not connect to database with the root user provided. Please try again.";
+        read -p "Existing root MySQL username: " mysqlrootuser
+        echo $mysqlrootuser | tee -a $LOGFILE > /dev/null
+        stty -echo
+        while true; do
+            read -p "MySQL password for user '$mysqlrootuser': " mysqlrootpass
+            echo ""
+            read -p "Re-enter the password to check for accuracy " mysqlrootpass2
+            if [[ "$mysqlrootpass" == "$mysqlrootpass2" ]] ; then
+                break;
+            fi
+            echo ""
+            echo "Passwords did not match. Please try again.";
+         done;
+         stty echo
+    # Needed for mysql version > 5.6
+    elif [[ $result == *password* ]] && [[ $result != *1007* ]] ; then
+        echo "Warning: Using a password on the command line interface can be insecure.";
+        break;
+    elif [[ $result == *1007* ]] ; then
+        echo "Could not create the database $mysqldb. A database with the name $mysqldb already exists.";
+        read -p "Database name: " mysqldb
+    elif [[ $result != '' ]]; then
+        echo "Could not create the database with the root user provided.";
+        exit 1;
+    else
+        break;
+    fi
 done;
 
-
-
-echo ""
-echo "Attempting to create the MySQL database '$mysqldb' ..."
-echo "CREATE DATABASE $mysqldb" | mysql -h$mysqlhost --user=$mysqlrootuser --password="$mysqlrootpass" -A > /dev/null 2>&1
-MySQLError=$?;
-if [ $MySQLError -ne 0 ] ; then
-	while true; do
-		echo "Could not connect to database with the root user provided. Please try again.";
-	        read -p "Existing root MySQL username: " mysqlrootuser
-		echo $mysqlrootuser | tee -a $LOGFILE > /dev/null
-		stty -echo
-		while true; do
-        		read -p "MySQL password for user '$mysqlrootuser': " mysqlrootpass
-        		read -p "Re-enter the password to check for accuracy " mysqlrootpass2
-        		if [[ "$mysqlrootpass" == "$mysqlrootpass2" ]] ; then
-                		break;
-		        fi
-			echo ""
-			echo "Passwords did not match. Please try again.";
-		done;
-		stty echo
-		echo "Attempting to create the MySQL database '$mysqldb' ..."
-		echo "CREATE DATABASE $mysqldb" | mysql -h$mysqlhost --user=$mysqlrootuser --password="$mysqlrootpass" -A > /dev/null 2>&1
-		MySQLError=$?;
-		if [ $MySQLError -ne 0 ] ; then
-			continue;
-		fi
-		break;
-	done;
-fi
 
 
 echo ""
@@ -303,7 +318,7 @@ echo "Creating database tables from schema."
 echo ""
 mysql $mysqldb -h$mysqlhost --user=$mysqlrootuser --password="$mysqlrootpass" -A 2>&1 < ../SQL/0000-00-00-schema.sql
 echo "Updating Loris admin user's password."
-mysql $mysqldb -h$mysqlhost --user=$mysqluser --password="$mysqlpass" -A -e "UPDATE users SET Password_MD5=CONCAT('aa', MD5('aa$lorispass')) WHERE ID=1"
+mysql $mysqldb -h$mysqlhost --user=$mysqluser --password="$mysqlpass" -A -e "UPDATE users SET Password_MD5=CONCAT('aa', MD5('aa$lorispass')), Pending_approval='N' WHERE ID=1"
 
 
 

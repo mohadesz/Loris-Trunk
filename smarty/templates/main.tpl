@@ -3,12 +3,10 @@
     {if $dynamictabs neq "dynamictabs"}
     <head>
         <link rel="stylesheet" href="{$css}" type="text/css" />
-        {if $test_name_css}
-            <link rel="stylesheet" href="css/instruments/{$test_name_css}" type="text/css" />
-        {/if}
         <link rel="shortcut icon" href="images/mni_icon.ico" type="image/ico" />
         <script src="js/jquery/jquery-1.11.0.min.js" type="text/javascript"></script>
         <script type="text/javascript" src="js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
+        <script type="text/javascript" src="js/jquery.dynamictable.js"></script>
         <!-- Custom JavaScript for the Menu Toggle -->
    
         <link type="text/css" href="css/loris-jquery/jquery-ui-1.10.4.custom.min.css" rel="Stylesheet" />
@@ -16,6 +14,11 @@
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="bootstrap-3.1.1/css/bootstrap.css">
         <!-- <link rel="stylesheet" href="bootstrap-3.1.1/css/magic-bootstrap.css"> -->
+
+        <!-- Module-specific CSS -->
+        {if $test_name_css}
+            <link rel="stylesheet" href="{$test_name_css}" type="text/css" />
+        {/if}
 
         <!-- Latest compiled and minified JavaScript -->
         <script src="bootstrap-3.1.1/js/bootstrap.min.js"></script>
@@ -48,12 +51,6 @@
                     window.open(myUrl, "MyWindow", "width=800, height=600, resizable=yes, scrollbars=yes, status=no, toolbar=no, location=no, menubar=no");
                     }
                 }
-                function open_help_section(){
-                    {/literal}
-                    var helpurl = "context_help_popup.php?test_name={$test_name}";
-                    {literal}
-                    window.open(helpurl);
-                }
 
                 function getCookie(c_name) {
                     "use strict";
@@ -71,11 +68,63 @@
                 $(document).ready(function(){
                     $("#menu-toggle").click(function(e) {
                         e.preventDefault();
-                        $("#wrapper").toggleClass("active");
+                        $(".wrapper").toggleClass("active");
                     });
                     $(".dropdown").hover(function(){
                         $(this).toggleClass('open');
                     });
+                    $(".help-button").click(function(e) {
+                        var getParams = {};
+                        {/literal}
+                        {if $test_name}
+                            getParams.test_name = "{$test_name|escape:"javascript"}";
+                        {/if}
+                        {if $subtest}
+                            getParams.subtest = "{$subtest|escape:"javascript"}";
+                        {/if}
+                        {literal}
+                        document.cookie = 'LastUrl=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+                        $.get("AjaxHelper.php?Module=help_editor&script=help.php", getParams, function (content) {
+                                var div = document.createElement("div"),
+                                    pre = document.createElement("pre"),
+                                    btn = document.createElement("BUTTON"),
+                                    edit = document.createElement("BUTTON"),
+                                    text = document.createTextNode("Edit"),
+                                    button = document.createTextNode("Close");
+
+                                pre.innerHTML = "<h3>" + content.topic + "</h3>";
+                                pre.innerHTML += content.content;
+                                pre.innerHTML =  pre.innerHTML + "<hr>Last updated: " + content.updated ;
+                                btn.appendChild(button);
+                                btn.className="btn btn-default";
+                                btn.setAttribute("id","helpclose");
+                                edit.appendChild(text);
+                                edit.className="btn btn-default";
+                                edit.setAttribute("id", "helpedit");
+                                div.appendChild(pre);
+                                div.appendChild(btn);
+                                {/literal}
+                                {if $hasHelpEditPermission}
+                                    div.appendChild(edit);
+                                {/if}
+                                {literal}
+                                document.getElementById('page').appendChild(div);
+                                div.setAttribute("class", "help-content");
+                                btn.addEventListener("click", function(e) {
+                                    $(div).hide();      
+                                    e.preventDefault(); 
+                                }) ;
+                                edit.addEventListener("click", function(e) {
+                                    document.cookie = "LastUrl = " + document.location.toString();
+                                    window.open("main.php?test_name=help_editor&subtest=edit_help_content&section="
+                                    +getParams.test_name+"&subsection="+getParams.subtest, "_self");      
+                                    e.preventDefault(); 
+                                }) ;
+                        }, "json");
+                        e.preventDefault();
+                    });
+
+                    $(".dynamictable").DynamicTable();
                 });
 
                 
@@ -103,13 +152,11 @@
                         <span class="sr-only">Toggle navigation</span>
                         <span class="glyphicon glyphicon-chevron-down" style="color:white"></span>
                     </button>
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" 
-                        data-target="#example-navbar-collapse" onClick="MyWindow=window.open('context_help_popup.php?test_name={$test_name}','MyWindow','toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=800,height=400'); return false;">
+                    <button type="button" class="navbar-toggle help-button">
                         <span class="sr-only">Toggle navigation</span>
                         <img width=17 src=images/help.gif>
                     </button>
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" 
-                        data-target="#example-navbar-collapse" >
+                    <button type="button" class="navbar-toggle" onclick="FeedbackButtonClicked()">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="glyphicon glyphicon-edit" style="color:white"></span>
                     </button>
@@ -121,31 +168,25 @@
                         </a>
                     {/if}
 
-                    <a class="navbar-brand" href="main.php">LORIS</a>
+                    <a class="navbar-brand" href="main.php">LORIS{if $sandbox}: DEV{/if}</a>
                </div>
                <div class="collapse navbar-collapse" id="example-navbar-collapse">
                     <ul class="nav navbar-nav">
                         {foreach from=$tabs item=tab}
-                            {if $tab.visible == 1}
+                            {if $tab.Visible == 1 && $tab.subtabs}
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle">
-                                        {$tab.label} <b class="caret"></b>
+                                        {$tab.Label} <b class="caret"></b>
                                     </a>
                                     <ul class="dropdown-menu">
-                                        {foreach from=$subtab item=mySubtab}
+                                        {foreach from=$tab.subtabs item=mySubtab}
+                                            {if $mySubtab.Visible == 1}
                                             <li>
-                                                {if $tab.label == $mySubtab.parent}
-                                                    {if $mySubtab.label == "Data Query Tool"}
-                                                        <a href="{$mySubtab.link}" target="_blank">
-                                                            {$mySubtab.label}
+                                                        <a href="{$mySubtab.Link}">
+                                                            {$mySubtab.Label}
                                                         </a>
-                                                    {else}
-                                                        <a href="{$mySubtab.link}">
-                                                            {$mySubtab.label}
-                                                        </a>
-                                                    {/if}
-                                                {/if}
                                             </li>
+                                            {/if}
                                         {/foreach}
                                     </ul>
                                 </li> 
@@ -159,7 +200,7 @@
                             </a>
                         </li>
                         <li class="hidden-xs hidden-sm">
-                            <a href="#" onClick="MyWindow=window.open('context_help_popup.php?test_name={$test_name}','MyWindow','toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=800,height=400'); return false;" class="navbar-brand pull-right">
+                            <a href="#" class="navbar-brand pull-right help-button">
                                 <img width=17 src=images/help.gif>
                             </a>
                         </li>
@@ -191,7 +232,7 @@
         {/if}
         <div id="page" class="container-fluid">
             {if $control_panel}
-                <div id="wrapper">
+                <div class="wrapper">
                 <!-- Sidebar -->
             
                     <div id="sidebar-wrapper" class="sidebar-div">
@@ -204,9 +245,30 @@
                 if not then just put page content in the div #page    -->
         <div id="page-content-wrapper">
             {/if}
+            {if $dynamictabs eq "dynamictabs"}
+                {if $console}
+                    <div class="alert alert-warning" role="alert">
+                        <h3>Console Output</h3>
+                        <div>
+                        <pre>{$console}</pre>
+                        </div>
+                    </div>
+                {/if}
+
+            {/if}
             {if $dynamictabs neq "dynamictabs"}
+            {* Add enough spacing to get below the menu *}
                 <br><br><br>
             <div class="page-content inset">
+                {if $console}
+                    <div class="alert alert-warning" role="alert">
+                        <h3>Console Output</h3>
+                        <div>
+                        <pre>{$console}</pre>
+                        </div>
+                    </div>
+
+                {/if}
                 <!-- <div class="panel panel-primary"> -->
                     
                     {if $crumbs != ""}
@@ -479,22 +541,28 @@
         </div>
         </div>
         {if $dynamictabs neq "dynamictabs"}
+            {if $control_panel}
+            <div id="footer" class="footer navbar-bottom wrapper">
+            {else}
             <div id="footer" class="footer navbar-bottom">
-                <ul id="navlist" style="margin-top: 5px; margin-bottom: 2px;" align="center">
-                    <li id="active">
-                        |
-                    </li>
-                    {foreach from=$links item=link}
-                            <li>  
-                                <a href="{$link.url}" style="color: #2FA4E7" target="{$link.windowName}">
-                                    {$link.label}
-                                </a> 
-                                |
-                            </li>
-                    {/foreach}
-                </ul>
+            {/if}
+                <center>
+                    <ul id="navlist" style="margin-top: 5px; margin-bottom: 2px;">
+                        <li id="active">
+                            |
+                        </li>
+                        {foreach from=$links item=link}
+                                <li>  
+                                    <a href="{$link.url}" style="color: #2FA4E7" target="{$link.windowName}">
+                                        {$link.label}
+                                    </a> 
+                                    |
+                                </li>
+                        {/foreach}
+                    </ul>    
+                </center>
                 <div align="center" colspan="1" style="color:#808080" >
-                    Powered by LORIS &copy; 2013. All rights reserved.
+                    Powered by LORIS &copy; {$currentyear}. All rights reserved.
                 </div>
                 <div align="center" colspan="1">
                     <a href="http://cbrain.mcgill.ca" style="color: #2FA4E7" target="_blank">

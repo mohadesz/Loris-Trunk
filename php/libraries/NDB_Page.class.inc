@@ -6,12 +6,40 @@ include_once ('HTML/QuickForm/Renderer/Default.php');
 
 class NDB_Page extends PEAR
 {
+    /**
+     * The name of the test_name being accessed
+     */
+    var $name;
+
+    /**
+     * The name of the page (subtest) being accessed
+     */
+    var $page;
+
+    /**
+     * Reference to the HTML QuickForm
+     */
+    var $form;
+
+    /**
+     * The identifier for the item to edit
+     * (ie. the CommentID)
+     */
+    var $identifier;
+    var $commentID;
+
+    /**
+     * Form defaults
+     */
+    var $defaults = array();
+
     function _setupPage($name, $page, $identifier, $commentID, $formname) {
         $this->form = new HTML_QuickForm($formname);
         $this->name = $name;
         $this->page = $page;
         $this->identifier = $identifier;
         $this->commentID = $commentID;
+        $this->defaults = array();
     }
     
     
@@ -34,7 +62,8 @@ class NDB_Page extends PEAR
     * Wrapper to create a select drop-down list
     */
 
-    function addSelect($name, $label, $options, $optional=array('class' => 'form-control input-sm')) {
+    function addSelect($name, $label, $options, $optional=array()) {
+        $optional = array_merge(array('class' => 'form-control input-sm'), $optional);
         $this->form->addElement('select', $name, $label, $options, $optional);
     }
 
@@ -55,7 +84,7 @@ class NDB_Page extends PEAR
     }
 
 
-    function addBasicText($field, $label, $options=null) {
+    function addBasicText($field, $label, $options=array()) {
         $options = array_merge(array('class' => 'form-control input-sm'), $options);
         $this->form->addElement('text', $field, $label, $options);
     }
@@ -105,7 +134,7 @@ class NDB_Page extends PEAR
     } 
 
     function createTextArea($field, $label=null) {
-       return $this->form->createElement("textarea", $field, $label);
+       return $this->form->createElement("textarea", $field, $label, array('class' => 'form-control input-sm'));
     } 
     function createDate($field, $label, $dateOptions=null, $attr=array('class' => 'form-control input-sm', 'style' => 'max-width:33%; display:inline-block;')) {
         return $this->form->createElement("date", $field, $label, $dateOptions, $attr);
@@ -149,15 +178,17 @@ class NDB_Page extends PEAR
         }
         if(!is_array($localDefaults)) { $localDefaults = array(); }
         // set the quickform object defaults
-        $this->form->setDefaults(array_merge($this->defaults, $localDefaults));
+        $this->_setDefaults(array_merge($this->defaults, $localDefaults));
 
             // trim all values
         $this->form->applyFilter('__ALL__', 'trim');
 
         // display the HTML_Quickform object
-        $smarty = new Smarty_neurodb;
+        $smarty = new Smarty_neurodb($this->name);
         $renderer = new HTML_QuickForm_Renderer_ArraySmarty($smarty);
         $this->form->accept($renderer);
+        $smarty->ModuleName = $this->name;
+
         $smarty->assign('form', $renderer->toArray());
         $smarty->assign($this->tpl_data);
         $html = $smarty->fetch("form_$this->template.tpl");
@@ -175,8 +206,18 @@ class NDB_Page extends PEAR
      */
     function _getDefaults()
     {
-        return array();
+        return $this->defaults;
     }
 
+    /**
+     * Sets the form-specific defaults for this page
+     *
+     * @return array The defaults
+     */
+    function _setDefaults($defaults = array()) {
+        $this->defaults = $defaults;
+        $this->form->setDefaults($defaults);
+        return $defaults;
+    }
 }
 ?>
