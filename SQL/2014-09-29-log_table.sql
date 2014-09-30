@@ -1,0 +1,7 @@
+ CREATE TABLE `log` (
+  `logID` int(11) NOT NULL AUTO_INCREMENT,
+  `Message` text,
+  `Created` date DEFAULT NULL,
+  `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`logID`)
+);
