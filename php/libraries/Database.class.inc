@@ -175,6 +175,9 @@ class Database extends PEAR
     function isConnected()
     {
         try { 
+            if(!$this->_PDO) {
+                return false;
+            }
             $this->_PDO->query("SELECT 'x'");
             return true;
         } catch(Exception $e) {
@@ -209,10 +212,6 @@ class Database extends PEAR
 
         // There is no where clause for an insert, so add a fake
         // one.
-        $err = $this->_trackChanges($table, $set, '2=1', 'I');
-        if ($this->isError($err)) {
-            return $err;
-        }
 
         $this->_printQuery($query);
         $prep = $this->_PDO->prepare($prepQ);
@@ -222,8 +221,15 @@ class Database extends PEAR
                 "Insert statement did not execute successfully."
             );
         }
+
         $this->affected = $prep->rowCount(); 
         $this->lastInsertID = $this->_PDO->lastInsertId();
+
+        // Track changes must be called after last insertId is set
+        $err = $this->_trackChanges($table, $set, '2=1', 'I');
+        if ($this->isError($err)) {
+            return $err;
+        }
         return true;
     }
 
@@ -367,8 +373,8 @@ class Database extends PEAR
      * @param array  &$result an array into which the results of the select 
      *                        will be stored - this array gets overwritten completely
      * 
-     * @return none
-     * @access public
+     * @return     none
+     * @access     public
      * @deprecated Use pselect wrappers instead
      */
     function select($query, &$result)
@@ -417,8 +423,8 @@ class Database extends PEAR
      * @param array  &$result an array into which the results of the select will 
      *                        be stored - this array gets overwritten completely
      *
-     * @return none
-     * @access public
+     * @return     none
+     * @access     public
      * @deprecated Use pselect wrappers instead
      */
     function selectRow($query, &$result)
@@ -436,8 +442,8 @@ class Database extends PEAR
      *
      * @param string $query The SQL string which defines the SELECT query.
      *
-     * @return string
-     * @access public
+     * @return     string
+     * @access     public
      * @deprecated Use pselect wrappers instead
      */
     function selectOne($query)
@@ -688,14 +694,28 @@ class Database extends PEAR
                 $this->_preparedStoreHistory->bindParam(":histcolumn", $column);
                 // find the primary key values
                 $primaryValues = array();
+
+                $usePDOID = false;
                 foreach ($primaryKeys AS $key) {
+                    if (!isset($set[$key])) {
+                        $usePDOID = true;
+                        break;
+                    }
                     $primaryValues[] = $set[$key];
+                }
+
+                if ($usePDOID) {
+                    if (is_array($this->lastInsertID)) {
+                        $primaryValues = $this->lastInsertID;
+                    } else {
+                        $primaryValues = array($this->lastInsertID);
+                    }
                 }
 
                 $prim_vals = join(",", $primaryValues);
                 $this->_preparedStoreHistory->bindParam(":newval", $set[$column]);
                 $this->_preparedStoreHistory->bindParam(":primaryVals", $prim_vals);
-                $this->_preparedStoreHistory->execute();
+                $history = $this->_preparedStoreHistory->execute();
             }
         } else if ($type == 'U' || $type == 'D') {
             // construct the select query

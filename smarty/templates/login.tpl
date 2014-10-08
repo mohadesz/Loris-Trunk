@@ -4,7 +4,8 @@
 <meta charset="utf-8"/>
 <!-- shortcut icon that displays on the browser window -->
 <link rel="shortcut icon" href="images/mni_icon.ico" type="image/ico" />
-<link rel="stylesheet" href="bootstrap-3.1.1/css/bootstrap.css">
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="bootstrap/css/custom-css.css">
 <!-- page title -->
 <title>{$title}</title>
 
@@ -170,6 +171,7 @@ BrowserDetect.init();
 				  			<input class="btn btn-primary col-xs-12" name="login" type="submit" value="login" />
 				  			<br><br><br>
 				  			<a href="lost_password.php"><center>Forgot your password?</center></a>
+				  			<a href="request_account/process_new_account.php"><center>Request Account</center></a>
 				  		</form>
 			  		</div>
 			  	</div>	
@@ -195,7 +197,7 @@ BrowserDetect.init();
 					<td align="center" colspan="1" style="color:#808080" >A WebGL-compatible browser is required for full functionality (Mozilla Firefox, Google Chrome)</td>
 					</tr>	
 					<tr>
-					<td align="center" colspan="1" style="color:#808080" >Powered by LORIS &copy; 2013. All rights reserved.</td>
+					<td align="center" colspan="1" style="color:#808080" >Powered by LORIS &copy; {$currentyear}. All rights reserved.</td>
 					</tr>	
 					<tr>
 					<td align="center" colspan="1"style="color: #808080">Created by <a href="http://cbrain.mcgill.ca" style="color: #064785" target="_blank"> ACElab</a></td>
