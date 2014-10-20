@@ -55,6 +55,7 @@
     <study>
         <PSCID>
             <!-- PSCID (Study Center ID) generation method possible options: sequential/random/user -->
+            <!-- For all 3 structures the Structure Type needs to be defined -->
             <generation>user</generation>
             <structure>
                 <seq type="alphanumeric" minLength="4"/> <!-- Ex: AAA1-->
