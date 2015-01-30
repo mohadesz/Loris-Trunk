@@ -6,12 +6,14 @@
         <link rel="shortcut icon" href="images/mni_icon.ico" type="image/ico" />
         <script src="js/jquery/jquery-1.11.0.min.js" type="text/javascript"></script>
         <script type="text/javascript" src="js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
+        <script type="text/javascript" src="js/jquery.dynamictable.js"></script>
         <!-- Custom JavaScript for the Menu Toggle -->
    
         <link type="text/css" href="css/loris-jquery/jquery-ui-1.10.4.custom.min.css" rel="Stylesheet" />
 
         <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="bootstrap-3.1.1/css/bootstrap.css">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bootstrap/css/custom-css.css">
         <!-- <link rel="stylesheet" href="bootstrap-3.1.1/css/magic-bootstrap.css"> -->
 
         <!-- Module-specific CSS -->
@@ -20,7 +22,7 @@
         {/if}
 
         <!-- Latest compiled and minified JavaScript -->
-        <script src="bootstrap-3.1.1/js/bootstrap.min.js"></script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
         <title>
             {$study_title}
         </title>
@@ -122,6 +124,8 @@
                         }, "json");
                         e.preventDefault();
                     });
+
+                    $(".dynamictable").DynamicTable();
                 });
 
                 
